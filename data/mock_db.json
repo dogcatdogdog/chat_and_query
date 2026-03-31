@@ -1,0 +1,35 @@
+{
+  "missions": {
+    "summary": {
+      "total": 42,
+      "completed": 15,
+      "running": 8,
+      "pending": 19
+    },
+    "comparison": "相比昨天增长了12%",
+    "peak_time": "10:00-12:00"
+  },
+  "devices": {
+    "total": 22,
+    "online_list": ["DJI-001", "DJI-002", "DJI-005", "DJI-008"],
+    "online_count": 18,
+    "offline_count": 4,
+    "task_count": 2,
+    "offline_list": ["DJI-003", "DJI-007"]
+  },
+  "events": {
+    "timeRange": "7days",
+    "total_count": 156,
+    "distribution": [
+      {"type": "人员入侵", "count": 68, "percent": "43.6%"},
+      {"type": "车辆检测", "count": 45, "percent": "28.8%"},
+      {"type": "设备缺陷", "count": 28, "percent": "17.9%"},
+      {"type": "烟火识别", "count": 15, "percent": "9.6%"}
+    ],
+    "patterns": [
+      "高发时段: 14:00-16:00 (占32%)",
+      "周三告警量激增至35次,建议检查当日巡检路线",
+      "人员入侵事件集中在禁区A,建议加强该区域监控"
+    ]
+  }
+}
