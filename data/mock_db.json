@@ -6,30 +6,26 @@
       "running": 8,
       "pending": 19
     },
-    "comparison": "相比昨天增长了12%",
-    "peak_time": "10:00-12:00"
+    "active_list": [
+      {"id": "MS-1001", "name": "电力线路巡检", "status": "RUNNING", "progress": "65%", "uav": "UAV-001"},
+      {"id": "MS-1002", "name": "禁区边界巡视", "status": "RUNNING", "progress": "30%", "uav": "UAV-005"}
+    ]
   },
   "devices": {
     "total": 22,
-    "online_list": ["DJI-001", "DJI-002", "DJI-005", "DJI-008"],
     "online_count": 18,
     "offline_count": 4,
-    "task_count": 2,
-    "offline_list": ["DJI-003", "DJI-007"]
+    "online_list": ["UAV-001", "UAV-002", "UAV-005", "UAV-008"],
+    "offline_list": ["UAV-003", "UAV-004", "UAV-006", "UAV-007"]
   },
   "events": {
-    "timeRange": "7days",
-    "total_count": 156,
     "distribution": [
       {"type": "人员入侵", "count": 68, "percent": "43.6%"},
-      {"type": "车辆检测", "count": 45, "percent": "28.8%"},
-      {"type": "设备缺陷", "count": 28, "percent": "17.9%"},
-      {"type": "烟火识别", "count": 15, "percent": "9.6%"}
+      {"type": "设备缺陷", "count": 28, "percent": "17.9%"}
     ],
-    "patterns": [
-      "高发时段: 14:00-16:00 (占32%)",
-      "周三告警量激增至35次,建议检查当日巡检路线",
-      "人员入侵事件集中在禁区A,建议加强该区域监控"
+    "recent": [
+      {"id": "EV-2024-001", "time": "10:30", "type": "人员入侵", "level": "CRITICAL", "location": "A1区", "desc": "发现不明人员翻越围栏"},
+      {"id": "EV-2024-002", "time": "11:15", "type": "设备缺陷", "level": "WARNING", "location": "变压器B2", "desc": "油温异常升高"}
     ]
   }
 }

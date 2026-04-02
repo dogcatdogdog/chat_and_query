@@ -52,19 +52,33 @@ class ExecutionEngine:
     def process(self, message: str, history: List[ChatHistory] = []) -> ChatResponse:
         # 1. Intent Recognition
         router_res = self.llm.call_llm(self.router_prompt, message, history)
+        
+        intent_type = "suggestion"
+        api_path = None
+        params = {}
+        data_returned = {}
+
         try:
             intent_data = json.loads(self._extract_json(router_res))
-            intent_type = intent_data.get("intent", "query")
-            api_path = intent_data.get("api", "GET /api/general")
+            intent_type = intent_data.get("intent", "suggestion")
+            api_path = intent_data.get("api")
             params = intent_data.get("params", {})
             
-            if "{sn}" in api_path and params.get("sn"):
+            # 处理 API 路径中的动态参数
+            if api_path and "{sn}" in api_path and params.get("sn"):
                 api_path = api_path.replace("{sn}", params["sn"])
-        except:
-            intent_type, api_path, params = "query", "GET /api/general", {}
+            if api_path and "{status}" in api_path and params.get("status"):
+                api_path = api_path.replace("{status}", params["status"])
+        except Exception:
+            # 解析失败时保持默认值
+            pass
 
-        # 2. Call Data Processor (Mock API)
-        data_returned = processor.call_api(api_path, params)
+        # 2. Call Data Processor (Only if API exists)
+        if api_path and api_path.lower() != "null":
+            data_returned = processor.call_api(api_path, params)
+        else:
+            api_path = "None" # 统一展示格式
+            data_returned = {"info": "No data query needed for this intent."}
         
         # 3. Response Generation
         responder_system = self.responder_prompt.replace("{context_data}", json.dumps(data_returned, ensure_ascii=False))
