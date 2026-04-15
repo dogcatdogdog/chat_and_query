@@ -48,43 +48,50 @@ MODEL="qwen-turbo"
 python -m src.main
 ```
 
-## 3. 运行测试
+## 3. 核心架构与数据流 (Engine Data Flow)
 
-本项目包含多个层级的测试脚本，可以通过以下方式运行：
+系统的核心逻辑由 `src/engine.py` 中的 `ExecutionEngine` 驱动，采用 **Router-Executor-Responder** 三阶段流水线：
 
-### 3.1 运行所有测试 (推荐)
+### 3.1 数据流向图
+`User Input` -> **[Router]** -> `Tool Calls` -> **[Executor]** -> `API Results` -> **[Responder]** -> `Final Markdown`
 
-你可以编写一个简单的 shell 脚本或直接依次运行以下命令：
+### 3.2 模块详解
+1.  **意图路由 (Router)**:
+    *   **输入**: 用户原始输入 + 历史对话上下文 (`history`) + 工具定义 (`tools_registry.json`)。
+    *   **处理**: 调用 LLM 匹配最合适的 API 或操作。
+    *   **输出**: 标准化的 `tool_calls` (Function Calling 协议)。
+2.  **执行器 (Executor)**:
+    *   **输入**: `tool_calls` 及其参数。
+    *   **处理**: 循环调用 `src/mock_api.py` 检索 `data/v1.1/resource_pool.json` 中的数据。
+    *   **输出**: 聚合后的 API 原始结果 JSON 串。
+3.  **信息加工 (Responder)**:
+    *   **输入**: 原始请求 + 聚合后的 API 结果 + `responder_prompt.md`。
+    *   **处理**: 执行数据审计、格式化转换（如数值加粗、回显 ID）、安全过滤。
+    *   **输出**: 符合 v1.1 规范的 `ChatResponse` 对象（含 Markdown 内容、意图列表及数据来源）。
 
+## 4. 运行测试
+
+本项目包含完整的验证体系，核心脚本如下：
+
+### 4.1 核心验收测试
+-   `tests/final_acceptance_v1_1.py`: **最终验收脚本**。包含 19 条意图用例及 100 条安全合规压测，验证准确率、合规率及格式规范。
+-   `tests/verify_v1_1_flows.py`: **全链路流程验证**。涵盖简单对话、带预警的业务查询及操作触发的完整闭环。
+
+### 4.2 专项验证脚本
+-   `tests/verify_mixed_intent.py`: **复合意图测试**。验证单次输入触发多个 API 调用（如：对比两台设备状态）的并发处理能力。
+-   `tests/verify_multi_turn_logic.py`: **多轮对话测试**。验证指代消解（如：“它目前的电量”）和上下文记忆。
+-   `tests/verify_error_scenarios.py`: **异常边界测试**。覆盖幻觉检测、敏感提问拦截及无关话题过滤。
+
+### 4.3 运行方式
 ```bash
-# Windows (PowerShell)
-Get-ChildItem tests/test_*.py | ForEach-Object { python $_.FullName }
+# 推荐：运行全链路流程验证
+python tests/verify_v1_1_flows.py
 
-# Linux/macOS
-for f in tests/test_*.py; do python "$f"; done
+# 推荐：运行最终验收测试
+python tests/final_acceptance_v1_1.py
 ```
 
-### 3.2 运行特定测试
-
-- **全链路测试 (E2E)**: 验证从输入到输出的完整流程。
-  ```bash
-  python tests/test_e2e.py
-  ```
-- **路由测试 (Router Only)**: 专门验证意图识别和 API 路由逻辑。
-  ```bash
-  python tests/test_router_only.py
-  ```
-- **回复测试 (Responder)**: 验证 AI 生成回复的格式和准确性。
-  ```bash
-  python tests/test_responder_single.py
-  python tests/test_responder_multi.py
-  ```
-- **异常测试**: 验证错误处理机制。
-  ```bash
-  python tests/test_exceptions.py
-  ```
-
-## 4. 扩展开发
+## 5. 扩展开发
 
 - **修改 Prompt**: 编辑 `prompts/` 目录下的 `.md` 文件。
 - **扩展 API**: 在 `src/processor.py` 中增加模拟 API 逻辑，并在 `data/mock_db.json` 中添加数据。

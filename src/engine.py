@@ -45,7 +45,7 @@ class ChatResponse(BaseModel):
     
     # 当 type = "text" 时使用
     content: Optional[str] = None        # Markdown 格式的回答正文
-    intentType: Optional[str] = None     # 意图类型：query | statistics | analysis | suggestion | chat
+    intentType: Optional[List[str]] = None # 意图类型列表：query | statistics | analysis | suggestion | chat
     dataSource: Optional[List[DataSource]] = None
     relatedResources: Optional[List[RelatedResource]] = None
     
@@ -91,61 +91,76 @@ class ExecutionEngine:
                     error=ErrorInfo(code="PROTOCOL_ERROR", message="模型未能按协议触发工具调用")
                 )
 
-            tool_call = llm_msg.tool_calls[0]
-            method = tool_call.function.name
-            params = json.loads(tool_call.function.arguments)
-            intent_type = params.get("intent", "query")
+            # --- 支持多工具调用循环 ---
+            all_api_results = []
+            data_sources = []
+            intents_set = set() # 使用集合去重
 
-            # --- 流程 1: 直接回复工具 (direct_response) ---
-            if method == "direct_response":
-                reply_content = params.get("reply", "抱歉，我暂时无法回答。")
-                return ChatResponse(
-                    type="text" if intent_type == "chat" else "error",
-                    content=reply_content if intent_type == "chat" else None,
-                    intentType=intent_type,
-                    error=ErrorInfo(code="INTENT_UNKNOWN", message=reply_content) if intent_type == "error" else None
-                )
+            for tool_call in llm_msg.tool_calls:
+                method = tool_call.function.name
+                params = json.loads(tool_call.function.arguments)
+                
+                # --- 方案二：从包装结构中提取 ---
+                intent_type = params.get("intent", "query")
+                payload = params.get("payload", {}) # 提取业务数据包
 
-            # --- 流程 2: 操作触发工具 (trigger_menu) ---
-            if intent_type == "action":
-                menu_id = params.get("menuId")
-                menu_config = self.menu_definitions.get(menu_id, {})
-                return ChatResponse(
-                    type="action",
-                    content=f"已为您准备好「{menu_config.get('menuName', menu_id)}」页面。",
-                    intentType="action",
-                    action=ActionDetail(
-                        pageRoute=menu_config.get("pageRoute", ""),
-                        actionType=menu_config.get("action", "create"),
-                        menuName=menu_config.get("menuName", ""),
-                        confirmRequired=menu_config.get("confirmRequired", True),
-                        formData=params,
-                        confirmMessage=f"请确认是否执行{menu_config.get('menuName')}操作？"
+                # --- 流程 1: 直接回复工具 (direct_response) ---
+                if method == "direct_response":
+                    reply_content = payload.get("reply", "抱歉，我暂时无法回答。")
+                    return ChatResponse(
+                        type="text" if intent_type == "chat" else "error",
+                        content=reply_content if intent_type == "chat" else None,
+                        intentType=[intent_type],
+                        error=ErrorInfo(code="INTENT_UNKNOWN", message=reply_content) if intent_type == "error" else None
                     )
-                )
 
-            # --- 流程 3: 业务处理工具 (Query/Stats/Analysis) ---
-            api_data = mock_api.call(method, params)
-            responder_system = self.responder_prompt.replace("{context_data}", json.dumps(api_data, ensure_ascii=False))
-            
-            # 信息加工 (Responder 调用，确保格式和预警)
+                # --- 流程 2: 操作触发工具 (trigger_menu) ---
+                if intent_type == "action":
+                    menu_id = payload.get("menuId")
+                    menu_config = self.menu_definitions.get(menu_id, {})
+                    return ChatResponse(
+                        type="action",
+                        content=f"已为您准备好「{menu_config.get('menuName', menu_id)}」页面。",
+                        intentType=["action"],
+                        action=ActionDetail(
+                            pageRoute=menu_config.get("pageRoute", ""),
+                            actionType=menu_config.get("action", "create"),
+                            menuName=menu_config.get("menuName", ""),
+                            confirmRequired=menu_config.get("confirmRequired", True),
+                            formData=payload,
+                            confirmMessage=f"请确认是否执行{menu_config.get('menuName')}操作？"
+                        )
+                    )
+
+                # --- 流程 3: 业务处理工具 (Query/Stats/Analysis) ---
+                # 注意：这里传给 API 的是干净的 payload
+                intents_set.add(intent_type)
+                api_data = mock_api.call(method, payload)
+                all_api_results.append({
+                    "tool": method,
+                    "params": payload,
+                    "intent": intent_type, # 明确标注这一段数据的意图分类
+                    "data": api_data
+                })
+                data_sources.append(DataSource(
+                    module=method, 
+                    api=f"/{method}", 
+                    dataReturned=f"已获取 {method} 的实时数据"
+                ))
+
+            # 如果没有业务数据返回
+            if not all_api_results:
+                return ChatResponse(type="text", content="未获取到相关数据。", intentType=list(intents_set))
+
+            # 将汇总数据交给 Responder
+            responder_system = self.responder_prompt.replace("{context_data}", json.dumps(all_api_results, ensure_ascii=False))
             final_msg = self.llm.call_llm(responder_system, message, context_window)
             
             return ChatResponse(
                 type="text",
                 content=final_msg.content,
-                intentType=intent_type,
-                dataSource=[DataSource(
-                    module=method, 
-                    api=f"/{method}", 
-                    dataReturned="已获取实时业务数据"
-                )]
-            )
-
-        except Exception as e:
-            return ChatResponse(
-                type="error",
-                error=ErrorInfo(code="RUNTIME_ERROR", message=str(e))
+                intentType=list(intents_set),
+                dataSource=data_sources
             )
 
         except Exception as e:

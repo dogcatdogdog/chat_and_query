@@ -9,7 +9,8 @@
   ],
   "missions": [
     { "id": "MIS-001", "name": "核心区巡检", "status": "RUNNING", "type": "instant", "routeId": "RT-001", "deviceId": "UAV-001" },
-    { "id": "MIS-002", "name": "每日例行", "status": "COMPLETED", "type": "scheduled", "routeId": "RT-002", "deviceId": "UAV-002" }
+    { "id": "MIS-002", "name": "每日例行", "status": "COMPLETED", "type": "scheduled", "routeId": "RT-002", "deviceId": "UAV-002" },
+    { "id": "MIS-003", "name": "变电站精细巡检", "status": "FAILED", "type": "instant", "routeId": "RT-003", "deviceId": "UAV-003", "failReason": "风速超限 (15m/s)" }
   ],
   "routes": [
     { "id": "RT-001", "name": "核心航线A", "distance": "5.2km", "duration": "15min" }

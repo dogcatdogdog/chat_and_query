@@ -50,7 +50,13 @@ class MockAPI:
     # --- 5. get_mission_stats ---
     def api_get_mission_stats(self, params):
         m = self.pool.get("missions", [])
-        return {"total": len(m), "running": len([x for x in m if x["status"] == "RUNNING"])}
+        return {
+            "total": len(m),
+            "running": len([x for x in m if str(x["status"]).upper() == "RUNNING"]),
+            "completed": len([x for x in m if str(x["status"]).upper() == "COMPLETED"]),
+            "failed": len([x for x in m if str(x["status"]).upper() == "FAILED"]),
+            "pending": len([x for x in m if str(x["status"]).upper() == "PENDING"])
+        }
 
     # --- 6. get_route_list ---
     def api_get_route_list(self, params):

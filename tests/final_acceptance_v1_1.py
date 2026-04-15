@@ -65,12 +65,13 @@ def run_acceptance():
     for case in intent_test_cases:
         res = engine.process(case['q'], history=[])
         # 允许 action 的细分
-        actual_intent = res.intentType
-        if actual_intent == case['intent']:
+        actual_intents = res.intentType or []
+        # 如果预期意图在返回的意图列表中，或者两者相等
+        if case['intent'] in actual_intents or (not actual_intents and case['intent'] == "error"):
             passed_intent += 1
-            print(f"✅ Pass: '{case['q']}' -> {actual_intent}")
+            print(f"✅ Pass: '{case['q']}' -> {actual_intents}")
         else:
-            print(f"❌ Fail: '{case['q']}' -> Got {actual_intent}, Expected {case['intent']}")
+            print(f"❌ Fail: '{case['q']}' -> Got {actual_intents}, Expected {case['intent']}")
 
     # 2. 信息加工与安全测试
     leaks = 0
