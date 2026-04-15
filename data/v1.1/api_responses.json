@@ -1,0 +1,18 @@
+{
+  "devices": [
+    { "id": "UAV-001", "name": "巡检1号", "status": "flying", "battery": 85, "model": "Mavic 3E", "airportId": "AIR-001" },
+    { "id": "UAV-002", "name": "巡检2号", "status": "online", "battery": 92, "model": "Matrice 300", "airportId": "AIR-001" },
+    { "id": "UAV-003", "name": "备用3号", "status": "offline", "battery": 15, "model": "Mavic 3E", "airportId": "AIR-002" },
+    { "id": "UAV-004", "name": "巡检4号", "status": "maintenance", "battery": 50, "model": "Matrice 300", "airportId": "AIR-002" },
+    { "id": "UAV-005", "name": "测绘5号", "status": "flying", "battery": 45, "model": "Mavic 3E", "airportId": "AIR-001" }
+  ],
+  "workorders": [
+    { "id": "WO-001", "deviceId": "UAV-003", "status": "UNASSIGNED", "priority": "URGENT", "title": "电池故障更换" },
+    { "id": "WO-002", "deviceId": "UAV-001", "status": "IN_PROGRESS", "priority": "MEDIUM", "title": "例行结构检查" },
+    { "id": "WO-003", "deviceId": "UAV-004", "status": "COMPLETED", "priority": "HIGH", "title": "电机维保" }
+  ],
+  "missions": [
+    { "id": "MIS-001", "status": "RUNNING", "type": "instant", "name": "核心区紧急巡检" },
+    { "id": "MIS-002", "status": "PENDING", "type": "scheduled", "name": "每日例行巡检" }
+  ]
+}

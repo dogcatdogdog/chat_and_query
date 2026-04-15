@@ -1,0 +1,365 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "direct_response",
+      "description": "当你不需要调用其他业务工具，仅需直接回复用户（包含闲聊、系统介绍、拒绝非法请求或处理无法识别的乱码）时，必须调用此工具。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["chat", "error"], "description": "闲聊/咨询选 chat，乱码/生活琐事/安全违规选 error" },
+          "reply": { "type": "string", "description": "你的专业回复内容。如果包含单引号等特殊字符，API 会自动处理转义。" }
+        },
+        "required": ["intent", "reply"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_device_list",
+      "description": "查询无人机设备列表。支持状态、型号筛选。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics", "analysis"], "description": "意图类别" },
+          "status": { "type": "string", "enum": ["online", "offline", "flying", "maintenance"] },
+          "model": { "type": "string" },
+          "airportId": { "type": "string" }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_device_detail",
+      "description": "获取单台无人机的详细实时数据。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics", "analysis"], "description": "意图类别" },
+          "id": { "type": "string", "description": "设备 ID" }
+        },
+        "required": ["id", "intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_airport_list",
+      "description": "查询机场列表及状态。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics"], "description": "意图类别" },
+          "status": { "type": "string", "enum": ["online", "offline"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_mission_list",
+      "description": "查询巡检任务列表。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics", "analysis"] },
+          "status": { "type": "string", "enum": ["RUNNING", "COMPLETED", "PENDING", "FAILED"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_mission_stats",
+      "description": "获取巡检任务统计汇总。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["statistics", "analysis"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_route_list",
+      "description": "查询航线规划列表。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_flight_records",
+      "description": "查询飞行日志记录。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics"] },
+          "uavId": { "type": "string" },
+          "date": { "type": "string" }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_flight_stats",
+      "description": "统计飞行时长及架次。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["statistics", "analysis"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_event_list",
+      "description": "查询 AI 告警事件列表。",
+      "parameters": {
+        "type": { "type": "string", "enum": ["CRITICAL", "WARNING", "INFO"] },
+        "intent": { "type": "string", "enum": ["query", "statistics"] }
+      },
+      "required": ["intent"]
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_event_stats",
+      "description": "分析 AI 事件统计数据。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["statistics", "analysis"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_report_list",
+      "description": "查询巡检报告列表。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics"] },
+          "type": { "type": "string", "enum": ["DAILY", "WEEKLY", "MONTHLY"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_report_summary",
+      "description": "获取报告摘要。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "analysis"] },
+          "id": { "type": "string" }
+        },
+        "required": ["id", "intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_workorder_list",
+      "description": "查询维修工单列表。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics", "analysis"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_workorder_stats",
+      "description": "获取工单处理效率统计。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["statistics", "analysis"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_algorithm_list",
+      "description": "查询 AI 算法启用状态。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_analytics_overview",
+      "description": "获取运营 KPI 概览。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["statistics", "analysis"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_analytics_trends",
+      "description": "获取业务趋势数据。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["analysis"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_video_list",
+      "description": "查询历史视频列表。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_photo_list",
+      "description": "查询巡检照片列表。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_geofence_list",
+      "description": "查询电子围栏定义。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_flyarea_list",
+      "description": "查询合法空域范围。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_entity_list",
+      "description": "查询设施实体列表。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "statistics"] }
+        },
+        "required": ["intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_entity_detail",
+      "description": "获取设施详细档案。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["query", "analysis"] },
+          "id": { "type": "string" }
+        },
+        "required": ["id", "intent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "trigger_menu",
+      "description": "触发前端页面跳转（操作意图专用）。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["action"], "description": "操作触发必须声明为 action" },
+          "menuId": { "type": "string" },
+          "reason": { "type": "string" },
+          "rawContext": { "type": "string" }
+        },
+        "required": ["menuId", "reason", "rawContext", "intent"]
+      }
+    }
+  }
+]

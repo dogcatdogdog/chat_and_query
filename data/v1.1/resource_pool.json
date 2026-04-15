@@ -1,0 +1,49 @@
+{
+  "devices": [
+    { "id": "UAV-001", "name": "巡检1号", "status": "flying", "battery": 85, "model": "Mavic 3E", "airportId": "AIR-001", "flightHours": 120 },
+    { "id": "UAV-002", "name": "巡检2号", "status": "online", "battery": 92, "model": "Matrice 300", "airportId": "AIR-001", "flightHours": 340 },
+    { "id": "UAV-003", "name": "备用3号", "status": "offline", "battery": 15, "model": "Mavic 3E", "airportId": "AIR-002", "flightHours": 45 }
+  ],
+  "airports": [
+    { "id": "AIR-001", "name": "北区机库", "status": "online", "slots": 5, "available": 2 }
+  ],
+  "missions": [
+    { "id": "MIS-001", "name": "核心区巡检", "status": "RUNNING", "type": "instant", "routeId": "RT-001", "deviceId": "UAV-001" },
+    { "id": "MIS-002", "name": "每日例行", "status": "COMPLETED", "type": "scheduled", "routeId": "RT-002", "deviceId": "UAV-002" }
+  ],
+  "routes": [
+    { "id": "RT-001", "name": "核心航线A", "distance": "5.2km", "duration": "15min" }
+  ],
+  "flight_records": [
+    { "id": "REC-001", "uavId": "UAV-001", "date": "2026-04-12", "duration": 35, "sorties": 1 }
+  ],
+  "events": [
+    { "id": "EVT-001", "type": "CRITICAL", "content": "电池过热", "status": "PENDING", "module": "设备管理" }
+  ],
+  "workorders": [
+    { "id": "WO-001", "deviceId": "UAV-003", "status": "UNASSIGNED", "priority": "URGENT", "title": "电池更换" }
+  ],
+  "algorithms": [
+    { "id": "ALG-001", "name": "烟火识别", "enabled": true, "threshold": 0.85 }
+  ],
+  "reports": [
+    { "id": "REP-001", "name": "3月简报", "type": "MONTHLY", "summary": "3月累计飞行120架次，发现缺陷12处。", "score": 95 }
+  ],
+  "analytics": {
+    "overview": { "kpi": "92%", "efficiency": "+15%", "risk": "LOW" },
+    "trends": { "labels": ["Mon", "Tue", "Wed"], "values": [12, 15, 8] }
+  },
+  "media": {
+    "videos": [{ "id": "VID-001", "name": "巡检录像", "deviceId": "UAV-001" }],
+    "photos": [{ "id": "PIC-001", "name": "异常照片", "deviceId": "UAV-003" }]
+  },
+  "geofences": [
+    { "id": "GF-001", "name": "禁飞区", "type": "NO_FLY" }
+  ],
+  "flyareas": [
+    { "id": "FA-001", "name": "测试空域", "status": "active" }
+  ],
+  "entities": [
+    { "id": "ENT-001", "name": "1号塔杆", "type": "TOWER", "health": "GOOD" }
+  ]
+}

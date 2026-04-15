@@ -1,0 +1,62 @@
+{
+  "workorder_create": {
+    "menuId": "workorder_create",
+    "menuName": "创建工单",
+    "description": "跳转到工单创建页面，适用于设备报修、巡检发现异常等场景。",
+    "pageRoute": "workorders",
+    "action": "create",
+    "triggerKeywords": ["报修", "工单", "故障", "维修"],
+    "formModel": {
+      "title": { "type": "string", "description": "工单标题", "fillFrom": "用户描述的问题或设备名称", "required": true },
+      "type": { "type": "enum", "enumValues": ["维修", "排查", "检查", "保养"], "description": "工单类型", "fillFrom": "根据问题性质判断", "required": true },
+      "priority": { "type": "enum", "enumValues": ["紧急", "高", "中", "低"], "description": "优先级", "fillFrom": "根据问题紧急程度判断", "required": true },
+      "deviceId": { "type": "string", "description": "关联设备 ID", "fillFrom": "对话中提到的设备名或SN", "required": false },
+      "description": { "type": "string", "description": "问题详细描述", "fillFrom": "用户描述的问题整理为规范文字", "required": true }
+    },
+    "confirmRequired": true,
+    "permissionRequired": ["operator", "admin"]
+  },
+  "mission_create": {
+    "menuId": "mission_create",
+    "menuName": "创建巡检任务",
+    "description": "跳转到任务创建页面，用于新建巡检任务。",
+    "pageRoute": "missions",
+    "action": "create",
+    "triggerKeywords": ["任务", "巡检", "安排", "调度"],
+    "formModel": {
+      "name": { "type": "string", "description": "任务名称", "fillFrom": "根据目标和时间生成", "required": true },
+      "type": { "type": "enum", "enumValues": ["instant", "scheduled", "periodic"], "description": "任务类型", "fillFrom": "根据紧迫程度判断", "required": true },
+      "routeId": { "type": "string", "description": "关联航线 ID", "fillFrom": "对话中提到的航线名称", "required": false },
+      "deviceId": { "type": "string", "description": "分配设备 ID", "fillFrom": "对话中提到的设备名称", "required": false }
+    },
+    "confirmRequired": true,
+    "permissionRequired": ["operator", "admin"]
+  },
+  "data_export": {
+    "menuId": "data_export",
+    "menuName": "导出素材",
+    "description": "跳转到数据中心导出图片或视频素材。",
+    "pageRoute": "data",
+    "action": "export",
+    "triggerKeywords": ["导出", "下载", "图片", "视频"],
+    "formModel": {
+      "dataType": { "type": "enum", "enumValues": ["photo", "video"], "description": "素材类型", "fillFrom": "用户提到的关键词", "required": true },
+      "startTime": { "type": "string", "description": "起始时间", "fillFrom": "上下文时间信息", "required": false }
+    },
+    "confirmRequired": false,
+    "permissionRequired": ["operator", "admin"]
+  },
+  "monitoring_view": {
+    "menuId": "monitoring_view",
+    "menuName": "实时监控",
+    "description": "跳转到实时监控页面观看无人机实时画面。",
+    "pageRoute": "monitoring",
+    "action": "view",
+    "triggerKeywords": ["监控", "直播", "画面", "看看"],
+    "formModel": {
+      "deviceId": { "type": "string", "description": "设备 ID", "fillFrom": "提到的设备名称", "required": true }
+    },
+    "confirmRequired": false,
+    "permissionRequired": ["operator", "admin"]
+  }
+}
