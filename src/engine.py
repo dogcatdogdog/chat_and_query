@@ -78,11 +78,13 @@ class ExecutionEngine:
         return []
 
     def process(self, message: str, history: List[ChatHistory] = []) -> ChatResponse:
+        print(f"\n>>> [ENGINE INPUT] Message: {message}")
         context_window = history[-10:] if len(history) > 10 else history
         
         try:
             # 1. 意图识别与工具分发 (Router using Function Calling ONLY)
             llm_msg = self.llm.call_llm(self.router_prompt, message, context_window, tools=self.tools_registry)
+            print(f"\n>>> [ROUTER OUTPUT] Tool Calls: {llm_msg.tool_calls}")
             
             # 核心约束：必须有 tool_calls
             if not llm_msg.tool_calls:
@@ -99,6 +101,7 @@ class ExecutionEngine:
             for tool_call in llm_msg.tool_calls:
                 method = tool_call.function.name
                 params = json.loads(tool_call.function.arguments)
+                print(f"\n>>> [EXECUTING TOOL] {method} | Args: {params}")
                 
                 # --- 方案二：从包装结构中提取 ---
                 intent_type = params.get("intent", "query")
@@ -132,29 +135,37 @@ class ExecutionEngine:
                         )
                     )
 
-                # --- 流程 3: 业务处理工具 (Query/Stats/Analysis) ---
-                # 注意：这里传给 API 的是干净的 payload
-                intents_set.add(intent_type)
-                api_data = mock_api.call(method, payload)
-                all_api_results.append({
-                    "tool": method,
-                    "params": payload,
-                    "intent": intent_type, # 明确标注这一段数据的意图分类
-                    "data": api_data
-                })
-                data_sources.append(DataSource(
-                    module=method, 
-                    api=f"/{method}", 
-                    dataReturned=f"已获取 {method} 的实时数据"
-                ))
+                # --- 流程 3: 业务处理工具 (data_process/query/statistics/analysis) ---
+                if intent_type in ["data_process", "query", "statistics", "analysis"]:
+                    intents_set.add(intent_type)
+                    api_data = mock_api.call(method, payload)
+                    all_api_results.append({
+                        "tool": method,
+                        "params": payload,
+                        "intent": intent_type, 
+                        "data": api_data
+                    })
+                    data_sources.append(DataSource(
+                        module=method, 
+                        api=f"/{method}", 
+                        dataReturned=f"已获取 {method} 的业务数据"
+                    ))
 
             # 如果没有业务数据返回
             if not all_api_results:
                 return ChatResponse(type="text", content="未获取到相关数据。", intentType=list(intents_set))
 
-            # 将汇总数据交给 Responder
-            responder_system = self.responder_prompt.replace("{context_data}", json.dumps(all_api_results, ensure_ascii=False))
-            final_msg = self.llm.call_llm(responder_system, message, context_window)
+            # --- 方案：数据后置 (Attention Sink) ---
+            # 不再替换系统提示词中的占位符，而是将其作为实时上下文追加到用户问题之后
+            contextual_message = (
+                f"{message}\n\n"
+                f"### [IMPORTANT: REAL-TIME DATA SOURCE]\n"
+                f"以下是本次请求唯一的真实数据来源，你的所有数字、ID 和结论必须基于此：\n"
+                f"<ContextData>\n{json.dumps(all_api_results, ensure_ascii=False, indent=2)}\n</ContextData>"
+            )
+
+            final_msg = self.llm.call_llm(self.responder_prompt, contextual_message, context_window)
+            print(f"\n>>> [RESPONDER OUTPUT] Content: {final_msg.content}")
             
             return ChatResponse(
                 type="text",

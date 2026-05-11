@@ -8,7 +8,7 @@ class LLMClient:
     def __init__(self):
         self.api_key = os.getenv("API_KEY")
         self.base_url = os.getenv("BASE_URL")
-        self.model = os.getenv("MODEL", "qwen-turbo")
+        self.model = os.getenv("MODEL", "qwen-max")
         self.client = OpenAI(
             api_key=self.api_key, 
             base_url=self.base_url

@@ -24,11 +24,11 @@
     "type": "function",
     "function": {
       "name": "get_device_list",
-      "description": "查询无人机列表。",
+      "description": "获取无人机设备清单及其原始属性（状态、电量等）。用于后续的查询、统计或健康分析。",
       "parameters": {
         "type": "object",
         "properties": {
-          "intent": { "type": "string", "enum": ["query", "statistics", "analysis"] },
+          "intent": { "type": "string", "const": "data_process" },
           "payload": {
             "type": "object",
             "properties": {
@@ -46,15 +46,15 @@
     "type": "function",
     "function": {
       "name": "get_device_detail",
-      "description": "获取单台无人机详情。",
+      "description": "获取单台无人机的详细实时参数。用于个案查询或故障分析。",
       "parameters": {
         "type": "object",
         "properties": {
-          "intent": { "type": "string", "enum": ["query", "statistics", "analysis"] },
+          "intent": { "type": "string", "const": "data_process" },
           "payload": {
             "type": "object",
             "properties": {
-              "id": { "type": "string", "description": "设备 ID" }
+              "id": { "type": "string", "description": "设备 SN 码或 ID" }
             },
             "required": ["id"]
           }
@@ -67,11 +67,26 @@
     "type": "function",
     "function": {
       "name": "get_airport_list",
-      "description": "查询机场列表。",
+      "description": "查询机场/机库的原始明细信息。",
       "parameters": {
         "type": "object",
         "properties": {
-          "intent": { "type": "string", "enum": ["query", "statistics"] },
+          "intent": { "type": "string", "const": "data_process" },
+          "payload": { "type": "object", "properties": {} }
+        },
+        "required": ["intent", "payload"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_mission_stats",
+      "description": "获取巡检任务的统计数据（成功率、任务总数等）。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": { "type": "string", "enum": ["data_process", "statistics"] },
           "payload": { "type": "object", "properties": {} }
         },
         "required": ["intent", "payload"]
@@ -82,11 +97,11 @@
     "type": "function",
     "function": {
       "name": "get_mission_list",
-      "description": "查询巡检任务列表。",
+      "description": "查询巡检任务的原始记录列表。包含任务状态、执行设备等基础事实。",
       "parameters": {
         "type": "object",
         "properties": {
-          "intent": { "type": "string", "enum": ["query", "statistics", "analysis"] },
+          "intent": { "type": "string", "const": "data_process" },
           "payload": {
             "type": "object",
             "properties": {
@@ -101,27 +116,12 @@
   {
     "type": "function",
     "function": {
-      "name": "get_mission_stats",
-      "description": "获取任务统计汇总。",
+      "name": "get_flight_records",
+      "description": "获取巡检飞行的原始架次记录（时长、日期等）。",
       "parameters": {
         "type": "object",
         "properties": {
-          "intent": { "type": "string", "enum": ["statistics", "analysis"] },
-          "payload": { "type": "object", "properties": {} }
-        },
-        "required": ["intent", "payload"]
-      }
-    }
-  },
-  {
-    "type": "function",
-    "function": {
-      "name": "get_flight_stats",
-      "description": "统计飞行时长及架次。",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "intent": { "type": "string", "enum": ["statistics", "analysis"] },
+          "intent": { "type": "string", "const": "data_process" },
           "payload": { "type": "object", "properties": {} }
         },
         "required": ["intent", "payload"]
@@ -132,11 +132,11 @@
     "type": "function",
     "function": {
       "name": "get_event_list",
-      "description": "查询 AI 告警事件列表。",
+      "description": "查询 AI 告警事件的原始明细。",
       "parameters": {
         "type": "object",
         "properties": {
-          "intent": { "type": "string", "enum": ["query", "statistics"] },
+          "intent": { "type": "string", "const": "data_process" },
           "payload": {
             "type": "object",
             "properties": {
@@ -152,11 +152,11 @@
     "type": "function",
     "function": {
       "name": "get_workorder_list",
-      "description": "查询维修工单列表。",
+      "description": "查询维修工单的原始清单及其状态。",
       "parameters": {
         "type": "object",
         "properties": {
-          "intent": { "type": "string", "enum": ["query", "statistics", "analysis"] },
+          "intent": { "type": "string", "const": "data_process" },
           "payload": { "type": "object", "properties": {} }
         },
         "required": ["intent", "payload"]
@@ -166,29 +166,8 @@
   {
     "type": "function",
     "function": {
-      "name": "get_entity_detail",
-      "description": "获取设施详细档案。",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "intent": { "type": "string", "enum": ["query", "analysis"] },
-          "payload": {
-            "type": "object",
-            "properties": {
-              "id": { "type": "string" }
-            },
-            "required": ["id"]
-          }
-        },
-        "required": ["id", "intent", "payload"]
-      }
-    }
-  },
-  {
-    "type": "function",
-    "function": {
       "name": "trigger_menu",
-      "description": "触发前端页面跳转。",
+      "description": "触发前端页面跳转动作。仅用于涉及流程发起或文件导出的意图。",
       "parameters": {
         "type": "object",
         "properties": {
